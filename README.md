@@ -49,7 +49,7 @@ Comandos de base de datos disponibles:
 | Comando | Qué hace |
 |---|---|
 | `flask --app run init-db` | Crea las tablas si no existen |
-| `flask --app run seed` | Carga los datos de demostración (solo si la base está vacía) |
+| `flask --app run seed` | Carga la demo en una base vacía o agrega la cuenta de Secretaría si falta |
 | `flask --app run reset-db` | Borra todo, recrea las tablas y vuelve a cargar los datos |
 
 Variables de entorno opcionales: `DATABASE_URL`, `JWT_SECRET_KEY`, `CORS_ORIGINS`.
@@ -70,10 +70,11 @@ En desarrollo, Vite redirige `/api` al backend en `localhost:5000`. Si despliega
 | Rol | Correo | Contraseña |
 |---|---|---|
 | Coordinador | `coordinador@demo.edu.co` | `Coord123*` |
+| Secretaria | `secretaria@demo.edu.co` | `Secretaria123*` |
 | Docente (3) | `docente1@demo.edu.co` a `docente3@demo.edu.co` | `Docente123*` |
 | Estudiante (10) | `estudiante1@demo.edu.co` a `estudiante10@demo.edu.co` | `Estudiante123*` |
 
-La pantalla de login incluye botones que rellenan las credenciales de cada rol.
+La pantalla de login incluye botones para rellenar las credenciales de cada rol.
 
 ## Guion de demostración (escenario de aceptación)
 
@@ -130,7 +131,8 @@ Restricciones: correo único, `hora_fin > hora_inicio`, estados válidos con `CH
 |---|---|
 | `POST /api/auth/login`, `GET /api/auth/me` | todos |
 | `GET /api/dashboard`, `GET /api/areas` | todos |
-| `GET /api/users?rol=docente\|estudiante` | coordinador |
+| `GET /api/users?rol=docente\|estudiante` | coordinador, secretaria |
+| `POST /api/users`, `PUT /api/users/:id`, `DELETE /api/users/:id` | secretaria |
 | `GET /api/requests` | coordinador (todas), estudiante (propias) |
 | `POST/PUT/DELETE /api/requests` | estudiante (solo solicitudes propias pendientes) |
 | `PATCH /api/requests/:id/aprobar`, `PATCH /api/requests/:id/rechazar`, `POST /api/requests/:id/programar` | coordinador |
@@ -142,5 +144,6 @@ Restricciones: correo único, `hora_fin > hora_inicio`, estados válidos con `CH
 
 - **Autenticación:** JWT de 8 horas guardado en `localStorage`. Es suficiente para una demo; en producción convendría usar cookies `HttpOnly`.
 - **Permisos:** se validan en el servidor en cada endpoint; el frontend solo oculta rutas.
+- **Usuarios:** la secretaria puede crear y editar docentes/estudiantes; al eliminarlos se desactivan para conservar el historial académico.
 - **Cruces de horario:** se bloquean para el docente y para el estudiante (se permiten sesiones contiguas, p. ej. 10:00–11:00 y 11:00–12:00). La solicitud se bloquea con `SELECT … FOR UPDATE` al programar.
 - **Fuera de alcance:** correos, WhatsApp, apps móviles, recuperación de contraseña, reportes PDF, gráficos, calificaciones, pagos e integraciones.

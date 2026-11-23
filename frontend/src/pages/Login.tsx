@@ -7,6 +7,7 @@ import { Button, Field, Input } from "../components/ui";
 
 const DEMO = [
   { rol: "Coordinador", email: "coordinador@demo.edu.co", password: "Coord123*" },
+  { rol: "Secretaria", email: "secretaria@demo.edu.co", password: "Secretaria123*" },
   { rol: "Docente", email: "docente1@demo.edu.co", password: "Docente123*" },
   { rol: "Estudiante", email: "estudiante1@demo.edu.co", password: "Estudiante123*" },
 ];

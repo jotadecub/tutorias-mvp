@@ -15,6 +15,7 @@ import StudentDashboard from "./pages/estudiante/Dashboard";
 import StudentHistory from "./pages/estudiante/History";
 import StudentRequests from "./pages/estudiante/Requests";
 import StudentSessions from "./pages/estudiante/Sessions";
+import SecretaryPeople from "./pages/secretaria/People";
 
 function Home() {
   const { user, loading } = useAuth();
@@ -42,6 +43,13 @@ export default function App() {
         <Route path="/docente" element={<Layout />}>
           <Route index element={<TeacherDashboard />} />
           <Route path="agenda" element={<TeacherAgenda />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute role="secretaria" />}>
+        <Route path="/secretaria" element={<Layout />}>
+          <Route index element={<Navigate to="personas" replace />} />
+          <Route path="personas" element={<SecretaryPeople />} />
         </Route>
       </Route>
 
