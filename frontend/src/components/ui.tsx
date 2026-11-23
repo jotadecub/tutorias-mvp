@@ -25,7 +25,7 @@ export function Button({ variant = "primary", loading, size = "md", className, c
       {...rest}
       disabled={disabled || loading}
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-2 hover:cursor-pointer focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
         size === "sm" ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm",
         VARIANTS[variant],
         className,
@@ -149,7 +149,7 @@ export function Table({ head, children }: { head: string[]; children: ReactNode 
         <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
           <tr>{head.map((h) => <th key={h} className="whitespace-nowrap px-5 py-3 font-medium">{h}</th>)}</tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">{children}</tbody>
+        <tbody className="divide-y text-left divide-slate-100">{children}</tbody>
       </table>
     </div>
   );
@@ -169,7 +169,7 @@ export function Modal({ title, onClose, children, footer }: { title: string; onC
       <div role="dialog" aria-modal="true" aria-label={title} className="flex max-h-[92vh] w-full max-w-lg flex-col rounded-t-2xl bg-white shadow-xl sm:rounded-2xl">
         <header className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <h2 className="text-base font-semibold text-slate-900">{title}</h2>
-          <button onClick={onClose} aria-label="Cerrar" className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"><X className="h-5 w-5" /></button>
+          <button onClick={onClose} aria-label="Cerrar" className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 hover:cursor-pointer"><X className="h-5 w-5" /></button>
         </header>
         <div className="overflow-y-auto px-5 py-4">{children}</div>
         {footer && <footer className="flex justify-end gap-2 border-t border-slate-100 px-5 py-3">{footer}</footer>}

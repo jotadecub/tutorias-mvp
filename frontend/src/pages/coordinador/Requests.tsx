@@ -45,7 +45,7 @@ export default function CoordRequests() {
       <div className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button key={f} onClick={() => setFilter(f)}
-            className={cx("rounded-full px-3 py-1.5 text-sm font-medium transition-colors", filter === f ? "bg-indigo-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50")}>
+            className={cx("rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:cursor-pointer", filter === f ? "bg-indigo-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50")}>
             {f === "todas" ? "Todas" : REQUEST_LABEL[f]} <span className={filter === f ? "text-indigo-200" : "text-slate-400"}>{count(f)}</span>
           </button>
         ))}
@@ -61,7 +61,7 @@ export default function CoordRequests() {
                 <Td><p className="font-medium text-slate-900">{r.estudiante.nombre}</p><p className="text-xs text-slate-500">{r.estudiante.grado}</p></Td>
                 <Td>{r.area.nombre}</Td>
                 <Td className="whitespace-nowrap">{formatDateTime(r.fecha_solicitud)}</Td>
-                <Td className="max-w-xs"><p className="truncate" title={r.motivo}>{r.motivo}</p></Td>
+                <Td className="max-w-40"><p className="truncate" title={r.motivo}>{r.motivo}</p></Td>
                 <Td><StatusBadge estado={r.estado} /></Td>
                 <Td>
                   <div className="flex flex-wrap gap-1.5">
