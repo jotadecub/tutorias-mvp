@@ -1,4 +1,4 @@
-import { CalendarCheck, CalendarDays, ClipboardList, GraduationCap, History, LayoutDashboard, LogOut, Menu, Users, X } from "lucide-react";
+import { CalendarCheck, CalendarDays, ClipboardList, GraduationCap, History, LayoutDashboard, LogOut, Menu, Users, X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useState, type ComponentType } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
@@ -34,16 +34,23 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   if (!user) return null;
 
   const sidebar = (
     <div className="flex h-full flex-col bg-white">
-      <div className="flex h-16 items-center gap-2.5 border-b border-slate-100 px-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white"><GraduationCap className="h-5 w-5" /></div>
-        <div className="leading-tight">
-          <p className="text-sm font-semibold text-slate-900">Tutorías</p>
-          <p className="text-xs text-slate-500">Refuerzo académico</p>
+      <div className="flex h-16 items-center justify-center gap-2.5 border-b border-slate-100 px-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white">
+          <GraduationCap className="h-5 w-5" />
         </div>
+
+        {!collapsed && (
+          <div className="leading-tight">
+            <p className="text-sm font-semibold text-slate-900">Tutorías</p>
+            <p className="text-xs text-slate-500">Refuerzo académico</p>
+          </div>
+        )}
+
       </div>
       <nav className="flex-1 space-y-1 p-3">
         {NAV[user.rol].map(({ to, label, icon: Icon, end }) => (
@@ -52,27 +59,74 @@ export default function Layout() {
             to={to}
             end={end}
             onClick={() => setOpen(false)}
-            className={({ isActive }) => cx("flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors", isActive ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900")}
+            title={collapsed ? label : undefined}
+            className={({ isActive }) =>
+              cx(
+                "flex items-center rounded-lg py-2 text-sm font-medium transition-colors",
+                collapsed ? "justify-center px-2" : "gap-3 px-3",
+                isActive
+                  ? "bg-indigo-50 text-indigo-700"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              )
+            }
           >
-            <Icon className="h-[18px] w-[18px]" />
-            {label}
+            <Icon className="h-[18px] w-[18px] shrink-0" />
+
+            {!collapsed && <span>{label}</span>}
           </NavLink>
         ))}
       </nav>
-      <div className="border-t border-slate-100 p-3">
+      {/* Acciones inferiores */}
+      <div className="border-t border-slate-100 p-3 space-y-1">
+
+        {/* Botón colapsar menú */}
         <button
-          onClick={() => { logout(); navigate("/login"); }}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? "Expandir menú" : "Colapsar menú"}
+          className={cx(
+            "flex w-full items-center rounded-lg py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900",
+            collapsed ? "justify-center px-2" : "gap-3 px-3"
+          )}
         >
-          <LogOut className="h-[18px] w-[18px]" /> Cerrar sesión
+          {collapsed ? (
+            <PanelLeftOpen className="h-[18px] w-[18px] shrink-0" />
+          ) : (
+            <PanelLeftClose className="h-[18px] w-[18px] shrink-0" />
+          )}
+
+          {!collapsed && <span>Colapsar menú</span>}
         </button>
+
+        {/* Cerrar sesión */}
+        <button
+          onClick={() => {
+            logout();
+            navigate("/login");
+          }}
+          title={collapsed ? "Cerrar sesión" : undefined}
+          className={cx(
+            "flex w-full items-center rounded-lg py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+            collapsed ? "justify-center px-2" : "gap-3 px-3"
+          )}
+        >
+          <LogOut className="h-[18px] w-[18px] shrink-0" />
+          {!collapsed && <span>Cerrar sesión</span>}
+        </button>
+
       </div>
     </div>
   );
 
   return (
     <div className="flex h-full">
-      <aside className="hidden w-64 shrink-0 border-r border-slate-200 lg:block">{sidebar}</aside>
+      <aside
+        className={cx(
+          "hidden shrink-0 border-r border-slate-200 transition-all duration-300 lg:block",
+          collapsed ? "w-20" : "w-64"
+        )}
+      >
+        {sidebar}
+      </aside>
 
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden">
