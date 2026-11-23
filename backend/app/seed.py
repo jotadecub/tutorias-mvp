@@ -6,11 +6,17 @@ from .models import (
     ROLE_NAMES, AcademicArea, Attendance, Role, TutoringRequest, TutoringSession, User,
 )
 
-PASSWORDS = {"coordinador": "Coord123*", "docente": "Docente123*", "estudiante": "Estudiante123*"}
+PASSWORDS = {
+    "coordinador": "Coord123*",
+    "secretaria": "Secretaria123*",
+    "docente": "Docente123*",
+    "estudiante": "Estudiante123*",
+}
 
 AREAS = ["Matemáticas", "Inglés", "Lenguaje", "Ciencias"]
 
 COORDINADOR = ("Andrés Ramírez (Coordinador)", "coordinador@demo.edu.co")
+SECRETARIA = ("Secretaría", "secretaria@demo.edu.co")
 DOCENTES = [
     ("Laura Mendoza", "docente1@demo.edu.co"),
     ("Carlos Peña", "docente2@demo.edu.co"),
@@ -37,6 +43,7 @@ def seed_database():
         return u
 
     make_user(*COORDINADOR, "coordinador")
+    make_user(*SECRETARIA, "secretaria")
     docentes = [make_user(n, e, "docente") for n, e in DOCENTES]
     estudiantes = [
         make_user(n, f"estudiante{i}@demo.edu.co", "estudiante", g)
@@ -86,3 +93,21 @@ def seed_database():
     add_session(add_request(est(2), "Inglés", "Vocabulario técnico", "Quiero reforzar vocabulario para el proyecto de ciencias.", "finalizada", 9), docentes[1], -3, (15, 0), (16, 0), "justificada", "El estudiante avisó por cita médica; se sugiere reprogramar.")
 
     db.session.commit()
+
+
+def seed_secretary_account():
+    email = SECRETARIA[1]
+    if db.session.execute(db.select(User.id).filter_by(email=email)).first():
+        return False
+
+    role = db.session.execute(db.select(Role).filter_by(nombre="secretaria")).scalar_one_or_none()
+    if role is None:
+        role = Role(nombre="secretaria")
+        db.session.add(role)
+        db.session.flush()
+
+    user = User(nombre=SECRETARIA[0], email=email, role=role)
+    user.set_password(PASSWORDS["secretaria"])
+    db.session.add(user)
+    db.session.commit()
+    return True

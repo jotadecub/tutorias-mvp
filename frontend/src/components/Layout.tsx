@@ -16,6 +16,9 @@ const NAV: Record<Rol, NavItem[]> = {
     { to: "/coordinador/asistencias", label: "Asistencias", icon: CalendarCheck },
     { to: "/coordinador/personas", label: "Estudiantes y docentes", icon: Users },
   ],
+  secretaria: [
+    { to: "/secretaria/personas", label: "Estudiantes y docentes", icon: Users },
+  ],
   docente: [
     { to: "/docente", label: "Dashboard", icon: LayoutDashboard, end: true },
     { to: "/docente/agenda", label: "Mi agenda", icon: CalendarDays },
@@ -28,7 +31,12 @@ const NAV: Record<Rol, NavItem[]> = {
   ],
 };
 
-const ROLE_LABEL: Record<Rol, string> = { coordinador: "Coordinador", docente: "Docente tutor", estudiante: "Estudiante" };
+const ROLE_LABEL: Record<Rol, string> = {
+  coordinador: "Coordinador",
+  secretaria: "Secretaria",
+  docente: "Docente tutor",
+  estudiante: "Estudiante",
+};
 
 export default function Layout() {
   const { user, logout } = useAuth();

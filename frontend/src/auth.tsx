@@ -51,4 +51,9 @@ export function useAuth() {
   return ctx;
 }
 
-export const HOME_BY_ROLE = { coordinador: "/coordinador", docente: "/docente", estudiante: "/estudiante" } as const;
+export const HOME_BY_ROLE = {
+  coordinador: "/coordinador",
+  secretaria: "/secretaria/personas",
+  docente: "/docente",
+  estudiante: "/estudiante",
+} as const;

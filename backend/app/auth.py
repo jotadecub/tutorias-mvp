@@ -20,6 +20,9 @@ def roles_required(*roles):
             verify_jwt_in_request()
             if get_jwt().get("rol") not in roles:
                 return jsonify(error="No tienes permisos para esta acción."), 403
+            user = db.session.get(User, int(get_jwt_identity()))
+            if not user or not user.activo:
+                return jsonify(error="Tu cuenta está inactiva."), 401
             return fn(*args, **kwargs)
 
         return wrapper

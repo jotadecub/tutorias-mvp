@@ -27,6 +27,25 @@ def test_passwords_are_hashed(app):
     assert user.password_hash.startswith(("scrypt:", "pbkdf2:"))
 
 
+def test_seed_adds_secretary_to_existing_database(app, client):
+    secretary = db.session.execute(db.select(User).filter_by(email="secretaria@demo.edu.co")).scalar_one()
+    role = secretary.role
+    db.session.delete(secretary)
+    db.session.flush()
+    db.session.delete(role)
+    db.session.commit()
+
+    result = app.test_cli_runner().invoke(args=["seed"])
+
+    assert result.exit_code == 0
+    assert "Cuenta demo de secretaría agregada." in result.output
+    response = client.post("/api/auth/login", json={
+        "email": "secretaria@demo.edu.co", "password": "Secretaria123*",
+    })
+    assert response.status_code == 200
+    assert response.get_json()["user"]["rol"] == "secretaria"
+
+
 def test_protected_routes_need_token_and_role(client, login):
     assert client.get("/api/dashboard").status_code == 401
     est = login("estudiante1@demo.edu.co", "estudiante")
@@ -34,6 +53,38 @@ def test_protected_routes_need_token_and_role(client, login):
     assert client.patch("/api/requests/1/aprobar", headers=est).status_code == 403
     doc = login("docente1@demo.edu.co", "docente")
     assert client.post("/api/requests", headers=doc, json={}).status_code == 403
+
+
+def test_secretary_can_manage_teachers_and_students(client, login, app):
+    secretary = login("secretaria@demo.edu.co", "secretaria")
+    teacher = client.post("/api/users", headers=secretary, json={
+        "nombre": "Docente Nuevo", "email": "nuevo@demo.edu.co", "password": "DocenteNuevo123*", "rol": "docente",
+    })
+    assert teacher.status_code == 201 and teacher.get_json()["rol"] == "docente"
+
+    student = client.post("/api/users", headers=secretary, json={
+        "nombre": "Estudiante Nuevo", "email": "nuevo.estudiante@demo.edu.co",
+        "password": "EstudianteNuevo123*", "rol": "estudiante", "grado": "9°",
+    })
+    assert student.status_code == 201 and student.get_json()["grado"] == "9°"
+    student_id = student.get_json()["id"]
+
+    assert client.put(f"/api/users/{student_id}", headers=secretary, json={
+        "nombre": "Estudiante Editado", "grado": "10°",
+    }).get_json()["nombre"] == "Estudiante Editado"
+    assert client.delete(f"/api/users/{student_id}", headers=secretary).get_json()["activo"] is False
+    assert client.delete(f"/api/users/{student_id}", headers=secretary).status_code == 404
+    assert client.get("/api/users?rol=estudiante", headers=secretary).status_code == 200
+
+    coordinator = login("coordinador@demo.edu.co", "coordinador")
+    assert client.post("/api/users", headers=coordinator, json={}).status_code == 403
+    assert client.post("/api/users", headers=secretary, json={
+        "nombre": "Sin Grado", "email": "s.grado@demo.edu.co", "password": "Estudiante123*", "rol": "estudiante",
+    }).status_code == 422
+
+    with app.app_context():
+        inactive_student = db.session.get(User, student_id)
+        assert inactive_student is not None and not inactive_student.activo
 
 
 # ---------- Flujo principal (criterio de aceptación del MVP) ----------

@@ -8,7 +8,7 @@ from .extensions import db
 REQUEST_STATES = ("pendiente", "aprobada", "rechazada", "programada", "finalizada")
 SESSION_STATES = ("programada", "finalizada")
 ATTENDANCE_STATES = ("asistio", "no_asistio", "justificada")
-ROLE_NAMES = ("coordinador", "docente", "estudiante")
+ROLE_NAMES = ("coordinador", "secretaria", "docente", "estudiante")
 
 
 def utcnow():
@@ -153,3 +153,4 @@ class Attendance(db.Model):
             "observaciones": self.observaciones,
             "registrado_en": self.created_at.isoformat(),
         }
+
